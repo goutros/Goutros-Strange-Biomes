@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "bottom": "goutrosstrangebiomes:block/pillow_dirt",
+    "side": "goutrosstrangebiomes:block/pillow_grass_block_side",
+    "top": "goutrosstrangebiomes:block/pillow_grass_block_top"
+  }
+}
