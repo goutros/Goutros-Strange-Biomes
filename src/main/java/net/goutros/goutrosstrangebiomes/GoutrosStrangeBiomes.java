@@ -1,8 +1,6 @@
 package net.goutros.goutrosstrangebiomes;
 
 import net.goutros.goutrosstrangebiomes.block.ModBlocks;
-import net.goutros.goutrosstrangebiomes.worldgen.density.ModDensityFunctions;
-import net.goutros.goutrosstrangebiomes.worldgen.generator.ModChunkGenerators;
 import net.goutros.goutrosstrangebiomes.tab.ModCreativeTabs;
 import net.goutros.goutrosstrangebiomes.worldgen.biome.ModBiomes;
 import net.goutros.goutrosstrangebiomes.worldgen.biome.PillowPlateauRegion;
@@ -14,10 +12,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.neoforged.neoforge.common.NeoForge;
 import terrablender.api.Regions;
 
 @Mod(GoutrosStrangeBiomes.MOD_ID)
@@ -38,10 +34,7 @@ public class GoutrosStrangeBiomes {
         ModBlocks.ITEMS.register(modEventBus);
         ModBiomes.BIOMES.register(modEventBus);
         ModCreativeTabs.CREATIVE_TABS.register(modEventBus);
-        ModDensityFunctions.DENSITY_FUNCTIONS.register(modEventBus);
 
-        // Register chunk generators - this is the new vanilla-compatible approach
-        ModChunkGenerators.CHUNK_GENERATORS.register(modEventBus);
 
         LOGGER.info("Registered vanilla-compatible chunk generation system and water color system");
     }
