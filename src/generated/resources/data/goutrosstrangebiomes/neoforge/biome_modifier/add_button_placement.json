@@ -1,0 +1,6 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": "goutrosstrangebiomes:pillow_plateau",
+  "features": "goutrosstrangebiomes:button_placement",
+  "step": "surface_structures"
+}

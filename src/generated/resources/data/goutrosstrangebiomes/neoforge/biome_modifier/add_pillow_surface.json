@@ -1,0 +1,6 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": "goutrosstrangebiomes:pillow_plateau",
+  "features": "goutrosstrangebiomes:pillow_surface",
+  "step": "vegetal_decoration"
+}

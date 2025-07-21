@@ -1,0 +1,11 @@
+{
+  "itemGroup.goutrosstrangebiomes.main": "Goutros Strange Biomes",
+  "entity.goutrosstrangebiomes.yarn_cat": "Yarn Cat",
+  "item.goutrosstrangebiomes.yarn_ball": "Yarn Ball",
+  "item.goutrosstrangebiomes.yarn_cat_spawn_egg": "Yarn Cat Spawn Egg",
+  "block.goutrosstrangebiomes.pillow_grass_block": "Pillow Grass Block",
+  "block.goutrosstrangebiomes.pillow_dirt": "Pillow Dirt",
+  "block.goutrosstrangebiomes.golden_pillow_grass_block": "Golden Pillow Grass Block",
+  "block.goutrosstrangebiomes.buttons": "Buttons",
+  "biome.goutrosstrangebiomes.pillow_plateau": "Pillow Plateau"
+}
