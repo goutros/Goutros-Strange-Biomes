@@ -34,7 +34,6 @@ public class TerrainGenerationAPI {
      */
     public static void register(IEventBus modEventBus) {
         // Core systems
-        TerrainGenerationAPI.register(modEventBus);
         ModCarvers.CARVERS.register(modEventBus);
         ModFeatures.CONFIGURED_FEATURES.register(modEventBus);
         ModFeatures.PLACED_FEATURES.register(modEventBus);

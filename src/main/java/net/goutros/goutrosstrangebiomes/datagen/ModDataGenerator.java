@@ -202,10 +202,10 @@ class ModEntityLootTables extends EntityLootSubProvider {
 class ModBiomeProvider extends DatapackBuiltinEntriesProvider {
     private static final RegistrySetBuilder BUILDER =
             new RegistrySetBuilder()
+                    .add(Registries.BIOME, ModBiomes::bootstrapBiomes) // Biomes first
                     .add(Registries.CONFIGURED_FEATURE, ModFeatures::bootstrapConfiguredFeatures)
                     .add(Registries.PLACED_FEATURE, ModFeatures::bootstrapPlacedFeatures)
-                    .add(Registries.CONFIGURED_CARVER, ModFeatures::bootstrapConfiguredCarvers)
-                    .add(Registries.BIOME, ModBiomes::bootstrapBiomes);
+                    .add(Registries.CONFIGURED_CARVER, ModFeatures::bootstrapConfiguredCarvers);
 
     public ModBiomeProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
         super(output, registries, BUILDER, Set.of(GoutrosStrangeBiomes.MOD_ID));
@@ -221,10 +221,18 @@ class ModBiomeModifierProvider extends JsonCodecProvider<BiomeModifier> {
 
     @Override
     protected void gather() {
+        var biomeRegistry = this.lookupProvider.join().lookupOrThrow(Registries.BIOME);
+        var featureRegistry = this.lookupProvider.join().lookupOrThrow(Registries.PLACED_FEATURE);
+
+        // Check if biome exists before using it
+        if (biomeRegistry.get(ModBiomes.PILLOW_PLATEAU).isEmpty()) {
+            return;
+        }
+
         // Add pillow terrain features
         add("add_pillow_terrain", new BiomeModifiers.AddFeaturesBiomeModifier(
-                HolderSet.direct(this.lookupProvider.join().lookupOrThrow(Registries.BIOME).getOrThrow(ModBiomes.PILLOW_PLATEAU)),
-                HolderSet.direct(this.lookupProvider.join().lookupOrThrow(Registries.PLACED_FEATURE).getOrThrow(ModFeatures.PILLOW_TERRAIN_PLACED_KEY)),
+                HolderSet.direct(biomeRegistry.getOrThrow(ModBiomes.PILLOW_PLATEAU)),
+                HolderSet.direct(featureRegistry.getOrThrow(ModFeatures.PILLOW_TERRAIN_PLACED_KEY)),
                 GenerationStep.Decoration.RAW_GENERATION
         ));
 
