@@ -1,17 +1,19 @@
 package net.goutros.goutrosstrangebiomes.worldgen.api.density;
 
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.util.KeyDispatchDataCodec;
 import net.minecraft.world.level.levelgen.DensityFunction;
-import net.minecraft.world.level.levelgen.DensityFunctions;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 public class CustomTerrainDensity implements DensityFunction.SimpleFunction {
 
     public static final MapCodec<CustomTerrainDensity> CODEC = RecordCodecBuilder.mapCodec(
             instance -> instance.group(
                     DensityFunction.HOLDER_HELPER_CODEC.fieldOf("input").forGetter(f -> f.input),
-                    MapCodec.DOUBLE.fieldOf("amplifier").forGetter(f -> f.amplifier)
+                    Codec.DOUBLE.fieldOf("amplifier").forGetter(f -> f.amplifier)
             ).apply(instance, CustomTerrainDensity::new)
     );
 
