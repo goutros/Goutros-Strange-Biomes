@@ -12,10 +12,10 @@ import terrablender.api.RegionType;
 import java.util.function.Consumer;
 
 /**
- * INLAND-ONLY Pillow Plateau Region
+ * STRICT INLAND-ONLY Pillow Plateau Region
  *
- * Carefully configured to NEVER generate in oceans, only in stable inland areas
- * where the canyon layering effect will work best without water interference.
+ * Uses MAXIMUM continentalness values and excludes ALL oceanic climate parameters
+ * to ensure biome NEVER generates in or near oceans.
  */
 public class PillowPlateauRegion extends Region {
 
@@ -26,51 +26,55 @@ public class PillowPlateauRegion extends Region {
     @Override
     public void addBiomes(Registry<Biome> registry, Consumer<Pair<Climate.ParameterPoint, ResourceKey<Biome>>> mapper) {
 
-        // DEEP INLAND AREAS ONLY - Maximum continentalness to avoid any water
+        // STRATEGY 1: MAXIMUM CONTINENTALNESS ONLY
+        // Only place in the most inland areas possible
         this.addBiome(mapper,
-                Climate.Parameter.span(-0.1F, 0.2F),     // Cool to warm temperature
-                Climate.Parameter.span(0.3F, 0.8F),      // Medium to high humidity
-                Climate.Parameter.span(0.7F, 1.0F),      // VERY HIGH continentalness - DEEP INLAND ONLY
-                Climate.Parameter.span(-0.3F, 0.1F),     // Low to medium erosion
-                Climate.Parameter.span(0.3F, 0.9F),      // ABOVE SEA LEVEL - elevated terrain
+                Climate.Parameter.span(-0.1F, 0.3F),     // Wide temperature range for variety
+                Climate.Parameter.span(0.2F, 0.9F),      // Wide humidity range
+                Climate.Parameter.span(0.85F, 1.0F),     // MAXIMUM continentalness - deepest inland
+                Climate.Parameter.span(-0.5F, 0.2F),     // Wide erosion range
+                Climate.Parameter.span(0.4F, 1.0F),      // ELEVATED terrain only
                 Climate.Parameter.span(0.5F, 1.0F),      // High weirdness for interesting terrain
                 0.0F,
                 ModBiomes.PILLOW_PLATEAU);
 
-        // CONTINENTAL HIGHLANDS - Mountain foothills far from water
+        // STRATEGY 2: CONTINENTAL HIGHLANDS
+        // Target mountain foothills and plateau regions
         this.addBiome(mapper,
-                Climate.Parameter.span(-0.2F, 0.1F),     // Cool highland climate
-                Climate.Parameter.span(0.4F, 0.9F),      // Good humidity
-                Climate.Parameter.span(0.8F, 1.0F),      // MAXIMUM continentalness - FAR FROM OCEANS
-                Climate.Parameter.span(-0.4F, -0.1F),    // Low erosion (stable highlands)
-                Climate.Parameter.span(0.5F, 1.0F),      // HIGH elevation - well above sea level
-                Climate.Parameter.span(0.6F, 0.9F),      // High weirdness
+                Climate.Parameter.span(-0.3F, 0.2F),     // Cool to mild temperature
+                Climate.Parameter.span(0.3F, 0.8F),      // Moderate humidity
+                Climate.Parameter.span(0.9F, 1.0F),      // ABSOLUTE MAXIMUM continentalness
+                Climate.Parameter.span(-0.3F, 0.0F),     // Low erosion for stable terrain
+                Climate.Parameter.span(0.6F, 1.0F),      // HIGH elevation - well above sea level
+                Climate.Parameter.span(0.7F, 1.0F),      // Very high weirdness
                 0.0F,
                 ModBiomes.PILLOW_PLATEAU);
 
-        // INTERIOR PLATEAUS - Mesa-like areas in continental centers
+        // STRATEGY 3: SPECIFIC INLAND SPOTS
+        // Target very specific climate combinations that are guaranteed inland
         this.addBiome(mapper,
-                Climate.Parameter.span(0.0F, 0.3F),      // Warm climate
-                Climate.Parameter.span(0.0F, 0.5F),      // Low to medium humidity
-                Climate.Parameter.span(0.75F, 1.0F),     // VERY HIGH continentalness - CONTINENTAL CENTER
-                Climate.Parameter.span(-0.2F, 0.2F),     // Medium erosion for interesting terrain
-                Climate.Parameter.span(0.4F, 0.8F),      // ELEVATED - well above sea level
-                Climate.Parameter.span(0.7F, 1.0F),      // Very high weirdness for dramatic canyons
+                Climate.Parameter.point(0.0F),           // Specific temperature
+                Climate.Parameter.span(0.4F, 0.7F),      // Specific humidity range
+                Climate.Parameter.span(0.95F, 1.0F),     // NEAR-MAXIMUM continentalness
+                Climate.Parameter.point(0.0F),           // Specific erosion
+                Climate.Parameter.span(0.5F, 0.8F),      // ELEVATED terrain
+                Climate.Parameter.span(0.75F, 0.9F),     // Specific weirdness range
                 0.0F,
                 ModBiomes.PILLOW_PLATEAU);
 
-        // ACCESSIBLE INLAND TESTING AREA - Easy to find but never oceanic
+        // STRATEGY 4: DESERT TRANSITION AREAS
+        // Target areas that transition from deserts (guaranteed inland)
         this.addBiome(mapper,
-                Climate.Parameter.span(-0.05F, 0.05F),   // Narrow temperature range
-                Climate.Parameter.span(0.5F, 0.7F),      // Specific humidity
-                Climate.Parameter.span(0.6F, 0.8F),      // HIGH continentalness - SAFELY INLAND
-                Climate.Parameter.span(-0.15F, 0.05F),   // Specific erosion
-                Climate.Parameter.span(0.4F, 0.7F),      // ELEVATED terrain - above sea level
-                Climate.Parameter.span(0.6F, 0.8F),      // Specific weirdness
+                Climate.Parameter.span(0.2F, 0.5F),      // Warm temperature
+                Climate.Parameter.span(-0.2F, 0.3F),     // Low to medium humidity
+                Climate.Parameter.span(0.8F, 1.0F),      // VERY HIGH continentalness
+                Climate.Parameter.span(-0.1F, 0.3F),     // Medium erosion
+                Climate.Parameter.span(0.3F, 0.7F),      // ABOVE sea level
+                Climate.Parameter.span(0.6F, 1.0F),      // High weirdness
                 0.0F,
                 ModBiomes.PILLOW_PLATEAU);
 
-        // Note: Removed mountain foothills variant that had lower continentalness
-        // to ensure ALL placements are safely inland
+        // Note: Completely removed any placements with continentalness below 0.8
+        // This should eliminate ALL ocean placement possibilities
     }
 }
