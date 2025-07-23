@@ -54,13 +54,13 @@ public class ModDataGenerator {
         CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
         ExistingFileHelper fileHelper = event.getExistingFileHelper();
 
-        // Enhanced data providers
+        // Basic data providers only
         generator.addProvider(event.includeServer(), new ModRecipeProvider(packOutput, lookupProvider));
         generator.addProvider(event.includeServer(), new ModBiomeProvider(packOutput, lookupProvider));
         generator.addProvider(event.includeServer(), new LootTableProvider(packOutput, Set.of(),
                 List.of(
-                        new LootTableProvider.SubProviderEntry(lookup -> new ModBlockLootProvider(lookup), LootContextParamSets.BLOCK),
-                        new LootTableProvider.SubProviderEntry(lookup -> new ModEntityLootTables(lookup), LootContextParamSets.ENTITY)
+                        new LootTableProvider.SubProviderEntry(ModBlockLootProvider::new, LootContextParamSets.BLOCK),
+                        new LootTableProvider.SubProviderEntry(ModEntityLootTables::new, LootContextParamSets.ENTITY)
                 ), lookupProvider));
         generator.addProvider(event.includeServer(), new ModBlockTagProvider(packOutput, lookupProvider));
         generator.addProvider(event.includeClient(), new ModBlockStateProvider(packOutput, fileHelper));

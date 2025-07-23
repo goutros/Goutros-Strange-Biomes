@@ -2,6 +2,7 @@ package net.goutros.goutrosstrangebiomes;
 
 import net.goutros.goutrosstrangebiomes.block.ModBlocks;
 import net.goutros.goutrosstrangebiomes.tab.ModCreativeTabs;
+import net.goutros.goutrosstrangebiomes.worldgen.api.TerrainGenerationAPI;
 import net.goutros.goutrosstrangebiomes.worldgen.biome.ModBiomes;
 import net.goutros.goutrosstrangebiomes.worldgen.biome.PillowPlateauRegion;
 import net.goutros.goutrosstrangebiomes.entity.ModEntities;
@@ -23,28 +24,23 @@ public class GoutrosStrangeBiomes {
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public GoutrosStrangeBiomes(IEventBus modEventBus, ModContainer modContainer) {
-        // Register the commonSetup method for modloading
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::clientSetup);
 
-        // Register all deferred registers
         ModEntities.ENTITY_TYPES.register(modEventBus);
         ModItems.ITEMS.register(modEventBus);
         ModBlocks.BLOCKS.register(modEventBus);
         ModBlocks.ITEMS.register(modEventBus);
         ModBiomes.BIOMES.register(modEventBus);
+        TerrainGenerationAPI.register(modEventBus);
         ModCreativeTabs.CREATIVE_TABS.register(modEventBus);
 
-
-        LOGGER.info("Registered vanilla-compatible chunk generation system and water color system");
+        LOGGER.info("Goutros Strange Biomes initialized");
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
         event.enqueueWork(() -> {
-            LOGGER.info("Setting up vanilla-compatible Pillow Plateau generation...");
-
-            // Register TerraBlender region for biome placement
-            // This now works in conjunction with our custom chunk generator
+            // Register biome region
             ResourceLocation regionId = ResourceLocation.fromNamespaceAndPath(MOD_ID, "pillow_plateau");
             Regions.register(new PillowPlateauRegion(regionId, 1));
 
@@ -57,12 +53,7 @@ public class GoutrosStrangeBiomes {
 
     private void clientSetup(final FMLClientSetupEvent event) {
         event.enqueueWork(() -> {
-            LOGGER.info("Setting up client-side water color system...");
-
-            // Client-specific setup for water colors
-            // The actual color handler registration happens through the @EventBusSubscriber
-
-            LOGGER.info("Client-side water color system ready!");
+            // Client setup for water colors handled by @EventBusSubscriber
         });
     }
 }
