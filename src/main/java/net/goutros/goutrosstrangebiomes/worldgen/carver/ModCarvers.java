@@ -1,4 +1,3 @@
-// Extensible Carver System for Custom Terrain
 package net.goutros.goutrosstrangebiomes.worldgen.carver;
 
 import net.goutros.goutrosstrangebiomes.GoutrosStrangeBiomes;
@@ -36,9 +35,17 @@ public class ModCarvers {
     public static final DeferredHolder<WorldCarver<?>, PillowCanyonCarver> PILLOW_CANYON =
             CARVERS.register("pillow_canyon", () -> new PillowCanyonCarver(CanyonCarverConfiguration.CODEC));
 
+    // Wool Canyon Carver - Colorful wool-layered canyons
+    public static final DeferredHolder<WorldCarver<?>, WoolCanyonCarver> WOOL_CANYON =
+            CARVERS.register("wool_canyon", () -> new WoolCanyonCarver(CanyonCarverConfiguration.CODEC));
+
     // Bubble Chamber Carver - Unique to pillow biomes
     public static final DeferredHolder<WorldCarver<?>, BubbleChamberCarver> BUBBLE_CHAMBER =
             CARVERS.register("bubble_chamber", () -> new BubbleChamberCarver(CaveCarverConfiguration.CODEC));
+
+    // Wool Cave Carver - Wool-lined cave systems
+    public static final DeferredHolder<WorldCarver<?>, WoolCaveCarver> WOOL_CAVE =
+            CARVERS.register("wool_cave", () -> new WoolCaveCarver(CaveCarverConfiguration.CODEC));
 }
 
 /**
@@ -111,6 +118,120 @@ abstract class BasePillowCarver<C extends net.minecraft.world.level.levelgen.car
                 chunk.setBlockState(pos, ModBlocks.PILLOW_DIRT.get().defaultBlockState(), false);
             }
         }
+    }
+}
+
+/**
+ * Enhanced wool cave carver that creates cozy wool-lined caves
+ */
+class WoolCaveCarver extends BasePillowCarver<CaveCarverConfiguration> {
+
+    private static final BlockState[] WOOL_CAVE_BLOCKS = {
+            Blocks.WHITE_WOOL.defaultBlockState(),
+            Blocks.LIGHT_GRAY_WOOL.defaultBlockState(),
+            Blocks.PINK_WOOL.defaultBlockState(),
+            ModBlocks.PILLOW_DIRT.get().defaultBlockState()
+    };
+
+    public WoolCaveCarver(com.mojang.serialization.Codec<CaveCarverConfiguration> codec) {
+        super(codec);
+    }
+
+    @Override
+    public boolean carve(CarvingContext context, CaveCarverConfiguration config, ChunkAccess chunk,
+                         Function<BlockPos, Holder<Biome>> biomeFunction, RandomSource random,
+                         Aquifer aquifer, ChunkPos chunkPos, CarvingMask carvingMask) {
+
+        if (!isPillowBiomeChunk(chunk, biomeFunction)) {
+            return false;
+        }
+
+        return carveWoolCaves(context, config, chunk, biomeFunction, random, aquifer, chunkPos, carvingMask);
+    }
+
+    private boolean carveWoolCaves(CarvingContext context, CaveCarverConfiguration config,
+                                   ChunkAccess chunk, Function<BlockPos, Holder<Biome>> biomeFunction,
+                                   RandomSource random, Aquifer aquifer, ChunkPos chunkPos,
+                                   CarvingMask carvingMask) {
+
+        int attempts = random.nextInt(3) + 1;
+        boolean carved = false;
+
+        for (int i = 0; i < attempts; i++) {
+            double centerX = chunkPos.getMiddleBlockX() + random.nextInt(16);
+            double centerY = config.y.sample(random, context);
+            double centerZ = chunkPos.getMiddleBlockZ() + random.nextInt(16);
+
+            // Smaller, cozier caves
+            double radiusH = config.horizontalRadiusMultiplier.sample(random) * 0.6;
+            double radiusV = config.verticalRadiusMultiplier.sample(random) * 0.5;
+
+            carved |= carveWoolChamber(context, config, chunk, biomeFunction, aquifer,
+                    centerX, centerY, centerZ, radiusH, radiusV, carvingMask, random);
+        }
+
+        return carved;
+    }
+
+    private boolean carveWoolChamber(CarvingContext context, CaveCarverConfiguration config,
+                                     ChunkAccess chunk, Function<BlockPos, Holder<Biome>> biomeFunction,
+                                     Aquifer aquifer, double centerX, double centerY, double centerZ,
+                                     double radiusH, double radiusV, CarvingMask carvingMask, RandomSource random) {
+
+        boolean carved = false;
+        int chunkMinX = chunk.getPos().getMinBlockX();
+        int chunkMinZ = chunk.getPos().getMinBlockZ();
+
+        int minX = Math.max(chunkMinX, (int) (centerX - radiusH));
+        int maxX = Math.min(chunkMinX + 15, (int) (centerX + radiusH));
+        int minY = Math.max(context.getMinGenY(), (int) (centerY - radiusV));
+        int maxY = Math.min(context.getMinGenY() + context.getGenDepth(), (int) (centerY + radiusV));
+        int minZ = Math.max(chunkMinZ, (int) (centerZ - radiusV));
+        int maxZ = Math.min(chunkMinZ + 15, (int) (centerZ + radiusV));
+
+        for (int x = minX; x <= maxX; x++) {
+            for (int y = minY; y <= maxY; y++) {
+                for (int z = minZ; z <= maxZ; z++) {
+                    double distanceH = Math.sqrt((x - centerX) * (x - centerX) + (z - centerZ) * (z - centerZ));
+                    double distanceV = Math.abs(y - centerY);
+
+                    if (distanceH / radiusH + distanceV / radiusV <= 1.0) {
+                        BlockPos pos = new BlockPos(x, y, z);
+                        BlockState current = chunk.getBlockState(pos);
+
+                        if (canReplaceBlock(config, current)) {
+                            // Distance from wall determines block type
+                            double wallDistance = 1.0 - (distanceH / radiusH + distanceV / radiusV);
+
+                            if (wallDistance > 0.8) {
+                                // Core - air
+                                chunk.setBlockState(pos, Blocks.CAVE_AIR.defaultBlockState(), false);
+                            } else if (wallDistance > 0.6) {
+                                // Near wall - wool
+                                int woolIndex = random.nextInt(WOOL_CAVE_BLOCKS.length - 1);
+                                chunk.setBlockState(pos, WOOL_CAVE_BLOCKS[woolIndex], false);
+                            }
+                            // Else keep existing block for natural transition
+
+                            carved = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        return carved;
+    }
+
+    private boolean isPillowBiomeChunk(ChunkAccess chunk, Function<BlockPos, Holder<Biome>> biomeFunction) {
+        BlockPos center = chunk.getPos().getMiddleBlockPosition(64);
+        Holder<Biome> biome = biomeFunction.apply(center);
+        return biome.is(ModBiomes.PILLOW_PLATEAU);
+    }
+
+    @Override
+    public boolean isStartChunk(CaveCarverConfiguration config, RandomSource random) {
+        return random.nextFloat() <= config.probability * 0.5F;
     }
 }
 
