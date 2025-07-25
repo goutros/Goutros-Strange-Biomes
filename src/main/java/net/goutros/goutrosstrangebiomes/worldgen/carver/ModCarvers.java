@@ -302,51 +302,68 @@ class PillowCanyonCarver extends BasePillowCarver<CanyonCarverConfiguration> {
                          Function<BlockPos, Holder<Biome>> biomeFunction, RandomSource random,
                          Aquifer aquifer, ChunkPos chunkPos, CarvingMask carvingMask) {
 
-        // Create gentle valley-like canyons
-        return carveGentleValleys(context, config, chunk, biomeFunction, random, aquifer, chunkPos, carvingMask);
+        // Create mesa-style layered terrain
+        return carveMesaLayers(context, config, chunk, biomeFunction, random, aquifer, chunkPos, carvingMask);
     }
 
-    private boolean carveGentleValleys(CarvingContext context, CanyonCarverConfiguration config,
-                                       ChunkAccess chunk, Function<BlockPos, Holder<Biome>> biomeFunction,
-                                       RandomSource random, Aquifer aquifer, ChunkPos chunkPos,
-                                       CarvingMask carvingMask) {
+    private boolean carveMesaLayers(CarvingContext context, CanyonCarverConfiguration config,
+                                    ChunkAccess chunk, Function<BlockPos, Holder<Biome>> biomeFunction,
+                                    RandomSource random, Aquifer aquifer, ChunkPos chunkPos,
+                                    CarvingMask carvingMask) {
 
-        if (random.nextFloat() > 0.02F) return false; // Rare generation
+        if (random.nextFloat() > 0.65F) return false; // Only 15% chance
 
-        double startX = chunkPos.getMiddleBlockX() + random.nextInt(16);
-        double startY = random.nextInt(random.nextInt(40) + 8) + 20;
-        double startZ = chunkPos.getMiddleBlockZ() + random.nextInt(16);
+        boolean carved = false;
+        int chunkMinX = chunkPos.getMinBlockX();
+        int chunkMinZ = chunkPos.getMinBlockZ();
 
-        // Gentler, wider valleys
-        float width = (random.nextFloat() * 2.0F + random.nextFloat()) * 3.0F; // Wider
-        float yScale = 1.0F + random.nextFloat() * 6.0F;
-        float slope = (random.nextFloat() - 0.5F) * 0.5F; // Gentler slope
+        // Process every column but simpler logic
+        for (int x = chunkMinX; x < chunkMinX + 16; x++) {
+            for (int z = chunkMinZ; z < chunkMinZ + 16; z++) {
+                carved |= carveTerrainColumn(context, config, chunk, x, z, random);
+            }
+        }
 
-        return carveValley(context, config, chunk, biomeFunction, aquifer, carvingMask,
-                startX, startY, startZ, width, yScale, slope, random);
+        return carved;
     }
 
-    private boolean carveValley(CarvingContext context, CanyonCarverConfiguration config,
-                                ChunkAccess chunk, Function<BlockPos, Holder<Biome>> biomeFunction,
-                                Aquifer aquifer, CarvingMask carvingMask,
-                                double startX, double startY, double startZ,
-                                float width, float yScale, float slope, RandomSource random) {
+    private boolean carveTerrainColumn(CarvingContext context, CanyonCarverConfiguration config,
+                                       ChunkAccess chunk, int x, int z, RandomSource random) {
 
-        // Simplified valley carving - create wider, shallower depressions
+        BlockPos checkPos = new BlockPos(x, 64, z);
+        Holder<Biome> biome = chunk.getNoiseBiome(x >> 2, 64 >> 2, z >> 2);
+        if (!biome.is(ModBiomes.PILLOW_PLATEAU)) {
+            return false; // Don't carve outside pillow biome
+        }
+
         boolean carved = false;
 
-        for (int step = 0; step < 30; step++) {
-            double currentY = startY + slope * step;
-            double radius = width * (1.0 - step / 30.0); // Taper at ends
+        // Simple distance-based stepped terrain
+        double distFromChunkCenter = Math.sqrt(
+                Math.pow(x % 16 - 8, 2) + Math.pow(z % 16 - 8, 2)
+        );
 
-            if (radius < 1.0) break;
+        // Create concentric "rings" of different heights
+        int heightStep;
+        if (distFromChunkCenter < 3) heightStep = 150;      // Center highest
+        else if (distFromChunkCenter < 6) heightStep = 120;  // Ring 2
+        else if (distFromChunkCenter < 9) heightStep = 90;   // Ring 3
+        else if (distFromChunkCenter < 12) heightStep = 60;  // Ring 4
+        else heightStep = 30;                               // Outer lowest
 
-            carved |= this.carveEllipsoid(
-                    context, config, chunk, biomeFunction, aquifer,
-                    startX, currentY, startZ,
-                    radius, radius * 0.3, // Wide and shallow
-                    carvingMask, (ctx, x, y, z, yPos) -> false
-            );
+        // Add some noise variation
+        double noise = Math.sin(x * 0.1) * Math.cos(z * 0.1) * 10.0;
+        int finalHeight = heightStep + (int)noise;
+
+        // Remove everything above this height
+        for (int y = finalHeight + 1; y <= 180; y++) {
+            BlockPos pos = new BlockPos(x, y, z);
+            BlockState existing = chunk.getBlockState(pos);
+
+            if (canReplaceBlock(config, existing)) {
+                chunk.setBlockState(pos, Blocks.CAVE_AIR.defaultBlockState(), false);
+                carved = true;
+            }
         }
 
         return carved;
@@ -354,7 +371,7 @@ class PillowCanyonCarver extends BasePillowCarver<CanyonCarverConfiguration> {
 
     @Override
     public boolean isStartChunk(CanyonCarverConfiguration config, RandomSource random) {
-        return random.nextFloat() <= config.probability * 0.5F; // Half normal chance
+        return random.nextFloat() <= 0.8F; // High probability for mesa generation
     }
 }
 

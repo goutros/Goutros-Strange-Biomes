@@ -187,51 +187,88 @@ public class ModFeatures {
         );
     }
 
-    private static CaveCarverConfiguration createPillowCaveConfig() {
-        return new CaveCarverConfiguration(
-                0.15F, // probability
-                UniformHeight.of(VerticalAnchor.absolute(10), VerticalAnchor.absolute(180)), // HeightProvider for y range
-                UniformFloat.of(0.1F, 0.9F), // y scale (FloatProvider)
-                VerticalAnchor.aboveBottom(8), // lava level
-                CarverDebugSettings.of(false, Blocks.CRIMSON_BUTTON.defaultBlockState()), // debug
-                HolderSet.direct(Blocks.STONE.builtInRegistryHolder(), Blocks.DEEPSLATE.builtInRegistryHolder()), // replaceable blocks
-                UniformFloat.of(0.7F, 1.4F), // horizontal radius
-                UniformFloat.of(0.5F, 1.2F), // vertical radius
-                UniformFloat.of(-1.0F, -0.4F) // floor level
+    private static CanyonCarverConfiguration createPillowCanyonConfig() {
+        return new CanyonCarverConfiguration(
+                1.0F, // 100% probability - carve EVERY chunk!
+                UniformHeight.of(VerticalAnchor.absolute(30), VerticalAnchor.absolute(140)),
+                UniformFloat.of(0.1F, 0.9F),
+                VerticalAnchor.aboveBottom(8),
+                CarverDebugSettings.of(false, Blocks.WARPED_BUTTON.defaultBlockState()),
+                HolderSet.direct(
+                        Blocks.STONE.builtInRegistryHolder(),
+                        Blocks.DEEPSLATE.builtInRegistryHolder(),
+                        Blocks.DIRT.builtInRegistryHolder(),
+                        Blocks.GRASS_BLOCK.builtInRegistryHolder(),
+                        Blocks.ANDESITE.builtInRegistryHolder(),
+                        Blocks.GRANITE.builtInRegistryHolder(),
+                        Blocks.DIORITE.builtInRegistryHolder(),
+                        // ALL the wool blocks too
+                        Blocks.WHITE_WOOL.builtInRegistryHolder(),
+                        Blocks.PINK_WOOL.builtInRegistryHolder(),
+                        Blocks.MAGENTA_WOOL.builtInRegistryHolder(),
+                        Blocks.PURPLE_WOOL.builtInRegistryHolder(),
+                        Blocks.BLUE_WOOL.builtInRegistryHolder(),
+                        Blocks.CYAN_WOOL.builtInRegistryHolder(),
+                        Blocks.LIME_WOOL.builtInRegistryHolder(),
+                        Blocks.YELLOW_WOOL.builtInRegistryHolder(),
+                        Blocks.ORANGE_WOOL.builtInRegistryHolder(),
+                        ModBlocks.PILLOW_DIRT.get().builtInRegistryHolder(),
+                        ModBlocks.PILLOW_GRASS_BLOCK.get().builtInRegistryHolder(),
+                        ModBlocks.GOLDEN_PILLOW_GRASS_BLOCK.get().builtInRegistryHolder()
+                ),
+                UniformFloat.of(20.0F, 40.0F), // MASSIVE horizontal reach
+                new CanyonCarverConfiguration.CanyonShapeConfiguration(
+                        UniformFloat.of(30.0F, 60.0F), // Enormous distance factor
+                        UniformFloat.of(8.0F, 15.0F),  // Very thick walls
+                        8, // Maximum smoothness
+                        UniformFloat.of(40.0F, 80.0F), // HUGE horizontal radius
+                        8.0F, // Maximum vertical radius
+                        15.0F  // Maximum center factor
+                )
         );
     }
 
-    private static CanyonCarverConfiguration createPillowCanyonConfig() {
-        return new CanyonCarverConfiguration(
-                0.15F, // Higher probability (was 0.01F)
-                UniformHeight.of(VerticalAnchor.absolute(40), VerticalAnchor.absolute(180)),
-                UniformFloat.of(0.3F, 0.9F),
+    private static CaveCarverConfiguration createPillowCaveConfig() {
+        return new CaveCarverConfiguration(
+                0.6F, // Much higher probability (60%)
+                UniformHeight.of(VerticalAnchor.absolute(10), VerticalAnchor.absolute(180)),
+                UniformFloat.of(0.1F, 0.9F),
                 VerticalAnchor.aboveBottom(8),
-                CarverDebugSettings.of(false, Blocks.WARPED_BUTTON.defaultBlockState()),
-                HolderSet.direct(/* all your pillow blocks + stone */),
-                UniformFloat.of(2.0F, 5.0F), // Much wider canyons
-                new CanyonCarverConfiguration.CanyonShapeConfiguration(
-                        UniformFloat.of(4.0F, 12.0F), // Larger distance factor
-                        UniformFloat.of(2.0F, 6.0F),  // Thicker walls
-                        3, // More width smoothness
-                        UniformFloat.of(8.0F, 20.0F), // Much larger horizontal radius
-                        1.5F, // Bigger vertical radius
-                        4.0F  // Bigger center factor
-                )
+                CarverDebugSettings.of(false, Blocks.CRIMSON_BUTTON.defaultBlockState()),
+                // FIX: Proper replaceable blocks
+                HolderSet.direct(
+                        Blocks.STONE.builtInRegistryHolder(),
+                        Blocks.DEEPSLATE.builtInRegistryHolder(),
+                        Blocks.DIRT.builtInRegistryHolder(),
+                        Blocks.GRASS_BLOCK.builtInRegistryHolder(),
+                        ModBlocks.PILLOW_DIRT.get().builtInRegistryHolder(),
+                        ModBlocks.PILLOW_GRASS_BLOCK.get().builtInRegistryHolder(),
+                        ModBlocks.GOLDEN_PILLOW_GRASS_BLOCK.get().builtInRegistryHolder()
+                ),
+                UniformFloat.of(2.0F, 8.0F), // Larger caves
+                UniformFloat.of(1.5F, 6.0F), // Taller caves
+                UniformFloat.of(-1.0F, -0.4F)
         );
     }
 
     private static CaveCarverConfiguration createBubbleChamberConfig() {
         return new CaveCarverConfiguration(
-                0.05F, // probability
-                UniformHeight.of(VerticalAnchor.absolute(30), VerticalAnchor.absolute(70)), // HeightProvider for y range
-                UniformFloat.of(0.3F, 0.7F), // y scale (FloatProvider)
-                VerticalAnchor.aboveBottom(8), // lava level
-                CarverDebugSettings.of(false, Blocks.MAGENTA_GLAZED_TERRACOTTA.defaultBlockState()), // debug
-                HolderSet.direct(Blocks.STONE.builtInRegistryHolder(), Blocks.DEEPSLATE.builtInRegistryHolder()), // replaceable blocks
-                UniformFloat.of(2.0F, 6.0F), // horizontal radius
-                UniformFloat.of(2.0F, 6.0F), // vertical radius (spherical)
-                UniformFloat.of(-1.0F, -0.4F) // floor level
+                0.3F, // Higher probability (30%)
+                UniformHeight.of(VerticalAnchor.absolute(30), VerticalAnchor.absolute(120)),
+                UniformFloat.of(0.3F, 0.7F),
+                VerticalAnchor.aboveBottom(8),
+                CarverDebugSettings.of(false, Blocks.MAGENTA_GLAZED_TERRACOTTA.defaultBlockState()),
+                // FIX: Proper replaceable blocks
+                HolderSet.direct(
+                        Blocks.STONE.builtInRegistryHolder(),
+                        Blocks.DEEPSLATE.builtInRegistryHolder(),
+                        ModBlocks.PILLOW_DIRT.get().builtInRegistryHolder(),
+                        ModBlocks.PILLOW_GRASS_BLOCK.get().builtInRegistryHolder(),
+                        ModBlocks.GOLDEN_PILLOW_GRASS_BLOCK.get().builtInRegistryHolder()
+                ),
+                UniformFloat.of(8.0F, 20.0F), // HUGE spherical chambers
+                UniformFloat.of(8.0F, 20.0F), // Perfectly spherical
+                UniformFloat.of(-1.0F, -0.4F)
         );
     }
 
