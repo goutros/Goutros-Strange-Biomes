@@ -4,6 +4,8 @@ package net.goutros.goutrosstrangebiomes.worldgen.features;
 import net.goutros.goutrosstrangebiomes.GoutrosStrangeBiomes;
 import net.goutros.goutrosstrangebiomes.block.ModBlocks;
 import net.goutros.goutrosstrangebiomes.worldgen.carver.ModCarvers;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
@@ -17,6 +19,8 @@ import net.minecraft.util.valueproviders.UniformFloat;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.GenerationStep;
+import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
 import net.minecraft.world.level.levelgen.carver.CarverDebugSettings;
 import net.minecraft.world.level.levelgen.carver.CarverConfiguration;
 import net.minecraft.world.level.levelgen.carver.CaveCarverConfiguration;
@@ -87,12 +91,13 @@ public class ModFeatures {
                     new ConfiguredFeature<>(Feature.SIMPLE_BLOCK,
                             new SimpleBlockConfiguration(BlockStateProvider.simple(ModBlocks.BUTTONS.get()))));
 
-    // Placed Features
     public static final DeferredHolder<PlacedFeature, PlacedFeature> PILLOW_TERRAIN_PLACED =
             PLACED_FEATURES.register("pillow_terrain", () ->
                     new PlacedFeature(PILLOW_TERRAIN.getDelegate(),
                             java.util.List.of(
-                                    HeightmapPlacement.onHeightmap(net.minecraft.world.level.levelgen.Heightmap.Types.WORLD_SURFACE_WG),
+                                    CountPlacement.of(10), // More attempts
+                                    InSquarePlacement.spread(),
+                                    HeightmapPlacement.onHeightmap(Heightmap.Types.WORLD_SURFACE_WG),
                                     BiomeFilter.biome()
                             )));
 
@@ -100,10 +105,10 @@ public class ModFeatures {
             PLACED_FEATURES.register("pillow_surface", () ->
                     new PlacedFeature(PILLOW_SURFACE.getDelegate(),
                             java.util.List.of(
-                                    CountPlacement.of(4),
+                                    CountPlacement.of(8), // More attempts
                                     InSquarePlacement.spread(),
-                                    HeightmapPlacement.onHeightmap(net.minecraft.world.level.levelgen.Heightmap.Types.WORLD_SURFACE_WG),
-                                    RarityFilter.onAverageOnceEvery(3),
+                                    HeightmapPlacement.onHeightmap(Heightmap.Types.WORLD_SURFACE_WG),
+                                    RarityFilter.onAverageOnceEvery(2), // More frequent
                                     BiomeFilter.biome()
                             )));
 
@@ -111,10 +116,10 @@ public class ModFeatures {
             PLACED_FEATURES.register("button_patches", () ->
                     new PlacedFeature(BUTTON_PATCHES.getDelegate(),
                             java.util.List.of(
-                                    CountPlacement.of(2),
+                                    CountPlacement.of(5), // More buttons
                                     InSquarePlacement.spread(),
-                                    HeightmapPlacement.onHeightmap(net.minecraft.world.level.levelgen.Heightmap.Types.WORLD_SURFACE_WG),
-                                    RarityFilter.onAverageOnceEvery(8),
+                                    HeightmapPlacement.onHeightmap(Heightmap.Types.WORLD_SURFACE_WG),
+                                    RarityFilter.onAverageOnceEvery(4), // More frequent
                                     BiomeFilter.biome()
                             )));
 
@@ -147,22 +152,38 @@ public class ModFeatures {
                 ResourceLocation.fromNamespaceAndPath(GoutrosStrangeBiomes.MOD_ID, name));
     }
 
-    // Configuration creation methods
     private static RandomPatchConfiguration createPillowTerrainConfig() {
-        return FeatureUtils.simplePatchConfiguration(
-                Feature.SIMPLE_BLOCK,
-                new SimpleBlockConfiguration(BlockStateProvider.simple(ModBlocks.PILLOW_DIRT.get())),
-                java.util.List.of(Blocks.GRASS_BLOCK),
-                32
+        return new RandomPatchConfiguration(
+                32, // tries
+                7,  // xz_spread
+                3,  // y_spread
+                PlacementUtils.filtered(
+                        Feature.SIMPLE_BLOCK,
+                        new SimpleBlockConfiguration(BlockStateProvider.simple(ModBlocks.PILLOW_DIRT.get())),
+                        BlockPredicate.allOf(
+                                BlockPredicate.ONLY_IN_AIR_PREDICATE,
+                                BlockPredicate.wouldSurvive(ModBlocks.PILLOW_DIRT.get().defaultBlockState(), BlockPos.ZERO)
+                        )
+                )
         );
     }
 
     private static RandomPatchConfiguration createPillowSurfaceConfig() {
-        return FeatureUtils.simplePatchConfiguration(
-                Feature.SIMPLE_BLOCK,
-                new SimpleBlockConfiguration(BlockStateProvider.simple(ModBlocks.PILLOW_GRASS_BLOCK.get())),
-                java.util.List.of(Blocks.DIRT, ModBlocks.PILLOW_DIRT.get()),
-                16
+        return new RandomPatchConfiguration(
+                16, // tries
+                7,  // xz_spread
+                3,  // y_spread
+                PlacementUtils.filtered(
+                        Feature.SIMPLE_BLOCK,
+                        new SimpleBlockConfiguration(BlockStateProvider.simple(ModBlocks.PILLOW_GRASS_BLOCK.get())),
+                        BlockPredicate.allOf(
+                                BlockPredicate.ONLY_IN_AIR_PREDICATE,
+                                BlockPredicate.anyOf(
+                                        BlockPredicate.matchesBlocks(Direction.DOWN.getNormal(), Blocks.DIRT),
+                                        BlockPredicate.matchesBlocks(Direction.DOWN.getNormal(), ModBlocks.PILLOW_DIRT.get())
+                                )
+                        )
+                )
         );
     }
 
@@ -182,20 +203,20 @@ public class ModFeatures {
 
     private static CanyonCarverConfiguration createPillowCanyonConfig() {
         return new CanyonCarverConfiguration(
-                0.01F, // probability (rare)
-                UniformHeight.of(VerticalAnchor.absolute(10), VerticalAnchor.absolute(180)), // HeightProvider for y range
-                UniformFloat.of(0.1F, 0.9F), // y scale (FloatProvider)
-                VerticalAnchor.aboveBottom(8), // lava level
-                CarverDebugSettings.of(false, Blocks.WARPED_BUTTON.defaultBlockState()), // debug
-                HolderSet.direct(Blocks.STONE.builtInRegistryHolder(), Blocks.DEEPSLATE.builtInRegistryHolder()), // replaceable blocks
-                UniformFloat.of(0.9F, 1.2F), // vertical rotation
+                0.15F, // Higher probability (was 0.01F)
+                UniformHeight.of(VerticalAnchor.absolute(40), VerticalAnchor.absolute(180)),
+                UniformFloat.of(0.3F, 0.9F),
+                VerticalAnchor.aboveBottom(8),
+                CarverDebugSettings.of(false, Blocks.WARPED_BUTTON.defaultBlockState()),
+                HolderSet.direct(/* all your pillow blocks + stone */),
+                UniformFloat.of(2.0F, 5.0F), // Much wider canyons
                 new CanyonCarverConfiguration.CanyonShapeConfiguration(
-                        UniformFloat.of(1.0F, 4.0F), // distance factor (FloatProvider)
-                        UniformFloat.of(0.9F, 1.2F), // thickness (FloatProvider)
-                        1, // width smoothness (int)
-                        UniformFloat.of(3.0F, 8.0F), // horizontal radius factor (FloatProvider)
-                        0.5F, // vertical radius default factor (float)
-                        2.0F // vertical radius center factor (float)
+                        UniformFloat.of(4.0F, 12.0F), // Larger distance factor
+                        UniformFloat.of(2.0F, 6.0F),  // Thicker walls
+                        3, // More width smoothness
+                        UniformFloat.of(8.0F, 20.0F), // Much larger horizontal radius
+                        1.5F, // Bigger vertical radius
+                        4.0F  // Bigger center factor
                 )
         );
     }

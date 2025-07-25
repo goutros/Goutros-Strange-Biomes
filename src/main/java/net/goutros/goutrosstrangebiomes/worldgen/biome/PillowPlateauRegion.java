@@ -19,14 +19,25 @@ public class PillowPlateauRegion extends Region {
 
     @Override
     public void addBiomes(Registry<Biome> registry, Consumer<Pair<Climate.ParameterPoint, ResourceKey<Biome>>> mapper) {
-        // Simple inland placement
+        // MUCH MORE PERMISSIVE CLIMATE PARAMETERS - this should actually generate!
         this.addBiome(mapper,
-                Climate.Parameter.span(0.0F, 0.4F),      // Temperature
-                Climate.Parameter.span(0.3F, 0.8F),      // Humidity
-                Climate.Parameter.span(0.8F, 1.0F),      // High continentalness (inland)
-                Climate.Parameter.span(-0.2F, 0.3F),     // Erosion
-                Climate.Parameter.span(0.4F, 0.8F),      // Depth
-                Climate.Parameter.span(0.5F, 1.0F),      // Weirdness
+                Climate.Parameter.span(-0.5F, 0.5F),      // Temperature - wider range
+                Climate.Parameter.span(0.0F, 1.0F),       // Humidity - wider range
+                Climate.Parameter.span(0.3F, 1.0F),       // Continentalness - still inland but easier
+                Climate.Parameter.span(-1.0F, 1.0F),      // Erosion - any erosion level
+                Climate.Parameter.span(-1.0F, 1.0F),      // Depth - any depth
+                Climate.Parameter.span(-1.0F, 1.0F),      // Weirdness - any weirdness
+                0.0F,
+                ModBiomes.PILLOW_PLATEAU);
+
+        // Add a second, even more permissive set for testing
+        this.addBiome(mapper,
+                Climate.Parameter.span(-1.0F, 1.0F),      // Temperature - any
+                Climate.Parameter.span(-1.0F, 1.0F),      // Humidity - any
+                Climate.Parameter.span(-1.0F, 1.0F),      // Continentalness - any
+                Climate.Parameter.span(-1.0F, 1.0F),      // Erosion - any
+                Climate.Parameter.span(-1.0F, 1.0F),      // Depth - any
+                Climate.Parameter.span(-1.0F, 1.0F),      // Weirdness - any
                 0.0F,
                 ModBiomes.PILLOW_PLATEAU);
     }

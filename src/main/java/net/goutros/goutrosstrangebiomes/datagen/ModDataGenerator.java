@@ -215,7 +215,8 @@ class ModBiomeProvider extends DatapackBuiltinEntriesProvider {
 class ModBiomeModifierProvider extends JsonCodecProvider<BiomeModifier> {
 
     public ModBiomeModifierProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider) {
-        super(output, PackOutput.Target.DATA_PACK, "neoforge/biome_modifier", net.minecraft.server.packs.PackType.SERVER_DATA,
+        super(output, PackOutput.Target.DATA_PACK, "neoforge/biome_modifier",
+                net.minecraft.server.packs.PackType.SERVER_DATA,
                 BiomeModifier.DIRECT_CODEC, lookupProvider, GoutrosStrangeBiomes.MOD_ID, null);
     }
 
@@ -224,31 +225,36 @@ class ModBiomeModifierProvider extends JsonCodecProvider<BiomeModifier> {
         var biomeRegistry = this.lookupProvider.join().lookupOrThrow(Registries.BIOME);
         var featureRegistry = this.lookupProvider.join().lookupOrThrow(Registries.PLACED_FEATURE);
 
-        // Check if biome exists before using it
-        if (biomeRegistry.get(ModBiomes.PILLOW_PLATEAU).isEmpty()) {
-            return;
+        // CRITICAL FIX: Ensure biome exists before creating modifiers
+        try {
+            var pillowBiome = biomeRegistry.getOrThrow(ModBiomes.PILLOW_PLATEAU);
+
+            // Add pillow terrain features (SURFACE_STRUCTURES for blocks like buttons)
+            add("add_pillow_terrain", new BiomeModifiers.AddFeaturesBiomeModifier(
+                    HolderSet.direct(pillowBiome),
+                    HolderSet.direct(featureRegistry.getOrThrow(ModFeatures.PILLOW_TERRAIN_PLACED_KEY)),
+                    GenerationStep.Decoration.UNDERGROUND_DECORATION // Changed from RAW_GENERATION
+            ));
+
+            // Add pillow surface features
+            add("add_pillow_surface", new BiomeModifiers.AddFeaturesBiomeModifier(
+                    HolderSet.direct(pillowBiome),
+                    HolderSet.direct(featureRegistry.getOrThrow(ModFeatures.PILLOW_SURFACE_PLACED_KEY)),
+                    GenerationStep.Decoration.VEGETAL_DECORATION
+            ));
+
+            // Add button placement
+            add("add_button_placement", new BiomeModifiers.AddFeaturesBiomeModifier(
+                    HolderSet.direct(pillowBiome),
+                    HolderSet.direct(featureRegistry.getOrThrow(ModFeatures.BUTTON_PATCHES_PLACED_KEY)),
+                    GenerationStep.Decoration.SURFACE_STRUCTURES // Better step for blocks
+            ));
+
+            GoutrosStrangeBiomes.LOGGER.info("Biome modifiers registered successfully");
+
+        } catch (Exception e) {
+            GoutrosStrangeBiomes.LOGGER.error("Failed to register biome modifiers: {}", e.getMessage());
         }
-
-        // Add pillow terrain features
-        add("add_pillow_terrain", new BiomeModifiers.AddFeaturesBiomeModifier(
-                HolderSet.direct(biomeRegistry.getOrThrow(ModBiomes.PILLOW_PLATEAU)),
-                HolderSet.direct(featureRegistry.getOrThrow(ModFeatures.PILLOW_TERRAIN_PLACED_KEY)),
-                GenerationStep.Decoration.RAW_GENERATION
-        ));
-
-        // Add pillow surface features
-        add("add_pillow_surface", new BiomeModifiers.AddFeaturesBiomeModifier(
-                HolderSet.direct(this.lookupProvider.join().lookupOrThrow(Registries.BIOME).getOrThrow(ModBiomes.PILLOW_PLATEAU)),
-                HolderSet.direct(this.lookupProvider.join().lookupOrThrow(Registries.PLACED_FEATURE).getOrThrow(ModFeatures.PILLOW_SURFACE_PLACED_KEY)),
-                GenerationStep.Decoration.VEGETAL_DECORATION
-        ));
-
-        // Add button placement
-        add("add_button_placement", new BiomeModifiers.AddFeaturesBiomeModifier(
-                HolderSet.direct(this.lookupProvider.join().lookupOrThrow(Registries.BIOME).getOrThrow(ModBiomes.PILLOW_PLATEAU)),
-                HolderSet.direct(this.lookupProvider.join().lookupOrThrow(Registries.PLACED_FEATURE).getOrThrow(ModFeatures.BUTTON_PATCHES_PLACED_KEY)),
-                GenerationStep.Decoration.SURFACE_STRUCTURES
-        ));
     }
 
     private void add(String name, BiomeModifier modifier) {

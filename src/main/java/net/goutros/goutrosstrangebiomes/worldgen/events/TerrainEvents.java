@@ -17,10 +17,10 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.level.ChunkEvent;
 import net.neoforged.neoforge.event.level.ChunkDataEvent;
 
-@EventBusSubscriber(modid = GoutrosStrangeBiomes.MOD_ID)
+//@EventBusSubscriber(modid = GoutrosStrangeBiomes.MOD_ID)
 public class TerrainEvents {
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+// @SubscribeEvent(priority = EventPriority.HIGH)
     public static void onChunkLoad(ChunkEvent.Load event) {
         ChunkAccess chunk = event.getChunk();
 
@@ -33,7 +33,7 @@ public class TerrainEvents {
         }
     }
 
-    @SubscribeEvent
+   // @SubscribeEvent
     public static void onChunkUnload(ChunkEvent.Unload event) {
         ChunkAccess chunk = event.getChunk();
 
@@ -41,7 +41,7 @@ public class TerrainEvents {
         logChunkStats(chunk);
     }
 
-    @SubscribeEvent
+//    @SubscribeEvent
     public static void onChunkDataLoad(ChunkDataEvent.Load event) {
         ChunkAccess chunk = event.getChunk();
         CompoundTag data = event.getData();
@@ -50,7 +50,7 @@ public class TerrainEvents {
         loadPillowDataFromNBT(chunk, data);
     }
 
-    @SubscribeEvent
+ //   @SubscribeEvent
     public static void onChunkDataSave(ChunkDataEvent.Save event) {
         ChunkAccess chunk = event.getChunk();
         CompoundTag data = event.getData();
