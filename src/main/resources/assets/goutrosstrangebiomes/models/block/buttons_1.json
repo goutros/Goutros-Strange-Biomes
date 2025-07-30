@@ -1,0 +1,17 @@
+{
+	"ambientocclusion": false,
+	"textures": {
+		"button": "goutrosstrangebiomes:block/buttons",
+		"particle": "#button"
+	},
+	"elements": [
+		{
+			"from": [0, 0.5, 0],
+			"to": [8, 0.5, 8],
+			"faces": {
+				"up":    { "uv": [0, 0, 8, 8], "texture": "#button" },
+				"down":  { "uv": [0, 0, 8, 8], "texture": "#button" }
+			}
+		}
+	]
+}

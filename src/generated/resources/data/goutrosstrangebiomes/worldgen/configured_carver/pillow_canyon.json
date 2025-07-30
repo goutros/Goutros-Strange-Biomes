@@ -1,0 +1,93 @@
+{
+  "type": "goutrosstrangebiomes:pillow_canyon",
+  "config": {
+    "debug_settings": {
+      "air_state": {
+        "Name": "minecraft:warped_button",
+        "Properties": {
+          "face": "wall",
+          "facing": "north",
+          "powered": "false"
+        }
+      },
+      "barrier_state": {
+        "Name": "minecraft:glass"
+      },
+      "lava_state": {
+        "Name": "minecraft:orange_stained_glass"
+      },
+      "water_state": {
+        "Name": "minecraft:candle",
+        "Properties": {
+          "candles": "1",
+          "lit": "false",
+          "waterlogged": "false"
+        }
+      }
+    },
+    "lava_level": {
+      "above_bottom": 8
+    },
+    "probability": 1.0,
+    "replaceable": [
+      "minecraft:stone",
+      "minecraft:deepslate",
+      "minecraft:dirt",
+      "minecraft:grass_block",
+      "minecraft:andesite",
+      "minecraft:granite",
+      "minecraft:diorite",
+      "minecraft:white_wool",
+      "minecraft:pink_wool",
+      "minecraft:magenta_wool",
+      "minecraft:purple_wool",
+      "minecraft:blue_wool",
+      "minecraft:cyan_wool",
+      "minecraft:lime_wool",
+      "minecraft:yellow_wool",
+      "minecraft:orange_wool",
+      "goutrosstrangebiomes:brown_pillow",
+      "goutrosstrangebiomes:pillow_grass_block",
+      "goutrosstrangebiomes:yellow_pillow_grass_block"
+    ],
+    "shape": {
+      "distance_factor": {
+        "type": "minecraft:uniform",
+        "max_exclusive": 60.0,
+        "min_inclusive": 30.0
+      },
+      "horizontal_radius_factor": {
+        "type": "minecraft:uniform",
+        "max_exclusive": 80.0,
+        "min_inclusive": 40.0
+      },
+      "thickness": {
+        "type": "minecraft:uniform",
+        "max_exclusive": 15.0,
+        "min_inclusive": 8.0
+      },
+      "vertical_radius_center_factor": 15.0,
+      "vertical_radius_default_factor": 8.0,
+      "width_smoothness": 8
+    },
+    "vertical_rotation": {
+      "type": "minecraft:uniform",
+      "max_exclusive": 40.0,
+      "min_inclusive": 20.0
+    },
+    "y": {
+      "type": "minecraft:uniform",
+      "max_inclusive": {
+        "absolute": 140
+      },
+      "min_inclusive": {
+        "absolute": 30
+      }
+    },
+    "yScale": {
+      "type": "minecraft:uniform",
+      "max_exclusive": 0.9,
+      "min_inclusive": 0.1
+    }
+  }
+}

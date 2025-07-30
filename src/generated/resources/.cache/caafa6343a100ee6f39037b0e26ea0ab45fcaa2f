@@ -1,0 +1,4 @@
+// 1.21.1	2025-07-30T23:09:19.5607956	Tags for minecraft:block mod id goutrosstrangebiomes
+3a49bd8fcd4ca69adcf9ea089c91ab78fbbddbea data/goutrosstrangebiomes/tags/block/pillows.json
+5bf0f1e68fe5ae4ad3cb6e48698cabcc1e6c7a94 data/minecraft/tags/block/replaceable.json
+46bc8e2f4ac1ca244dd3d18eb3f4eaf44764560e data/minecraft/tags/block/wool.json

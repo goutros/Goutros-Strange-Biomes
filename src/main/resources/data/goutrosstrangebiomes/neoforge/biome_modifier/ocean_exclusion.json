@@ -1,0 +1,7 @@
+{
+  "type": "neoforge:remove_spawns",
+  "biomes": [
+    "goutrosstrangebiomes:pillow_plateau"
+  ],
+  "entity_types": "#minecraft:water_animals"
+}
