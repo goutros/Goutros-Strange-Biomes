@@ -5,7 +5,6 @@
   "compatibilityLevel": "JAVA_21",
   "refmap": "goutrosstrangebiomes.refmap.json",
   "mixins": [
-    "ChunkGeneratorMixin"
   ],
   "client": [],
   "server": [],

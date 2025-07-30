@@ -122,10 +122,6 @@ public class ModFeatures {
             CONFIGURED_CARVERS.register("pillow_cave", () ->
                     new ConfiguredWorldCarver<>(ModCarvers.PILLOW_CAVE.get(), createPillowCaveConfig()));
 
-    public static final DeferredHolder<ConfiguredWorldCarver<?>, ConfiguredWorldCarver<?>> PILLOW_CANYON_CONFIGURED =
-            CONFIGURED_CARVERS.register("pillow_canyon", () ->
-                    new ConfiguredWorldCarver<>(ModCarvers.PILLOW_CANYON.get(), createPillowCanyonConfig()));
-
     public static final DeferredHolder<ConfiguredWorldCarver<?>, ConfiguredWorldCarver<?>> BUBBLE_CHAMBER_CONFIGURED =
             CONFIGURED_CARVERS.register("bubble_chamber", () ->
                     new ConfiguredWorldCarver<>(ModCarvers.BUBBLE_CHAMBER.get(), createBubbleChamberConfig()));
@@ -181,14 +177,17 @@ public class ModFeatures {
         );
     }
 
+// Add this to your ModFeatures.java - updated carver configurations
+
     private static CanyonCarverConfiguration createPillowCanyonConfig() {
         return new CanyonCarverConfiguration(
-                1.0F, // 100% probability - carve EVERY chunk!
-                UniformHeight.of(VerticalAnchor.absolute(30), VerticalAnchor.absolute(140)),
+                1.0F, // 100% probability - GUARANTEED mesa generation!
+                UniformHeight.of(VerticalAnchor.absolute(40), VerticalAnchor.absolute(180)), // Full height range
                 UniformFloat.of(0.1F, 0.9F),
                 VerticalAnchor.aboveBottom(8),
-                CarverDebugSettings.of(false, Blocks.WARPED_BUTTON.defaultBlockState()),
+                CarverDebugSettings.of(false, Blocks.DIAMOND_BLOCK.defaultBlockState()), // Debug with diamond
                 HolderSet.direct(
+                        // All blocks that can be replaced for mesa carving
                         Blocks.STONE.builtInRegistryHolder(),
                         Blocks.DEEPSLATE.builtInRegistryHolder(),
                         Blocks.DIRT.builtInRegistryHolder(),
@@ -196,72 +195,106 @@ public class ModFeatures {
                         Blocks.ANDESITE.builtInRegistryHolder(),
                         Blocks.GRANITE.builtInRegistryHolder(),
                         Blocks.DIORITE.builtInRegistryHolder(),
-                        // ALL the wool blocks too
+                        // All wool blocks
                         Blocks.WHITE_WOOL.builtInRegistryHolder(),
-                        Blocks.PINK_WOOL.builtInRegistryHolder(),
+                        Blocks.ORANGE_WOOL.builtInRegistryHolder(),
                         Blocks.MAGENTA_WOOL.builtInRegistryHolder(),
+                        Blocks.LIGHT_BLUE_WOOL.builtInRegistryHolder(),
+                        Blocks.YELLOW_WOOL.builtInRegistryHolder(),
+                        Blocks.LIME_WOOL.builtInRegistryHolder(),
+                        Blocks.PINK_WOOL.builtInRegistryHolder(),
+                        Blocks.GRAY_WOOL.builtInRegistryHolder(),
+                        Blocks.LIGHT_GRAY_WOOL.builtInRegistryHolder(),
+                        Blocks.CYAN_WOOL.builtInRegistryHolder(),
                         Blocks.PURPLE_WOOL.builtInRegistryHolder(),
                         Blocks.BLUE_WOOL.builtInRegistryHolder(),
-                        Blocks.CYAN_WOOL.builtInRegistryHolder(),
-                        Blocks.LIME_WOOL.builtInRegistryHolder(),
-                        Blocks.YELLOW_WOOL.builtInRegistryHolder(),
-                        Blocks.ORANGE_WOOL.builtInRegistryHolder(),
+                        Blocks.BROWN_WOOL.builtInRegistryHolder(),
+                        Blocks.GREEN_WOOL.builtInRegistryHolder(),
+                        Blocks.RED_WOOL.builtInRegistryHolder(),
+                        Blocks.BLACK_WOOL.builtInRegistryHolder(),
+                        // Your custom blocks
                         ModBlocks.BROWN_PILLOW.get().builtInRegistryHolder(),
                         ModBlocks.PILLOW_GRASS_BLOCK.get().builtInRegistryHolder(),
-                        ModBlocks.YELLOW_PILLOW_GRASS_BLOCK.get().builtInRegistryHolder()
+                        ModBlocks.YELLOW_PILLOW_GRASS_BLOCK.get().builtInRegistryHolder(),
+                        // All other pillow blocks
+                        ModBlocks.WHITE_PILLOW.get().builtInRegistryHolder(),
+                        ModBlocks.LIGHT_GRAY_PILLOW.get().builtInRegistryHolder(),
+                        ModBlocks.GRAY_PILLOW.get().builtInRegistryHolder(),
+                        ModBlocks.BLACK_PILLOW.get().builtInRegistryHolder(),
+                        ModBlocks.RED_PILLOW.get().builtInRegistryHolder(),
+                        ModBlocks.ORANGE_PILLOW.get().builtInRegistryHolder(),
+                        ModBlocks.YELLOW_PILLOW.get().builtInRegistryHolder(),
+                        ModBlocks.LIME_PILLOW.get().builtInRegistryHolder(),
+                        ModBlocks.GREEN_PILLOW.get().builtInRegistryHolder(),
+                        ModBlocks.CYAN_PILLOW.get().builtInRegistryHolder(),
+                        ModBlocks.LIGHT_BLUE_PILLOW.get().builtInRegistryHolder(),
+                        ModBlocks.BLUE_PILLOW.get().builtInRegistryHolder(),
+                        ModBlocks.PURPLE_PILLOW.get().builtInRegistryHolder(),
+                        ModBlocks.MAGENTA_PILLOW.get().builtInRegistryHolder(),
+                        ModBlocks.PINK_PILLOW.get().builtInRegistryHolder()
                 ),
-                UniformFloat.of(20.0F, 40.0F), // MASSIVE horizontal reach
+                UniformFloat.of(0.5F, 2.0F), // Reduced horizontal radius for more controlled carving
                 new CanyonCarverConfiguration.CanyonShapeConfiguration(
-                        UniformFloat.of(30.0F, 60.0F), // Enormous distance factor
-                        UniformFloat.of(8.0F, 15.0F),  // Very thick walls
-                        8, // Maximum smoothness
-                        UniformFloat.of(40.0F, 80.0F), // HUGE horizontal radius
-                        8.0F, // Maximum vertical radius
-                        15.0F  // Maximum center factor
+                        UniformFloat.of(10.0F, 25.0F), // Reduced distance factor
+                        UniformFloat.of(3.0F, 8.0F),   // Moderate thickness
+                        4,                              // Medium smoothness
+                        UniformFloat.of(8.0F, 20.0F),  // Moderate horizontal radius
+                        4.0F,                          // Moderate vertical radius
+                        8.0F                           // Moderate center factor
                 )
         );
     }
 
     private static CaveCarverConfiguration createPillowCaveConfig() {
         return new CaveCarverConfiguration(
-                0.6F, // Much higher probability (60%)
-                UniformHeight.of(VerticalAnchor.absolute(10), VerticalAnchor.absolute(180)),
+                0.15F, // Low probability - just for caves
+                UniformHeight.of(VerticalAnchor.absolute(10), VerticalAnchor.absolute(120)),
                 UniformFloat.of(0.1F, 0.9F),
                 VerticalAnchor.aboveBottom(8),
-                CarverDebugSettings.of(false, Blocks.CRIMSON_BUTTON.defaultBlockState()),
-                // FIX: Proper replaceable blocks
+                CarverDebugSettings.of(false, Blocks.EMERALD_BLOCK.defaultBlockState()),
                 HolderSet.direct(
                         Blocks.STONE.builtInRegistryHolder(),
                         Blocks.DEEPSLATE.builtInRegistryHolder(),
-                        Blocks.DIRT.builtInRegistryHolder(),
-                        Blocks.GRASS_BLOCK.builtInRegistryHolder(),
                         ModBlocks.BROWN_PILLOW.get().builtInRegistryHolder(),
                         ModBlocks.PILLOW_GRASS_BLOCK.get().builtInRegistryHolder(),
-                        ModBlocks.YELLOW_PILLOW_GRASS_BLOCK.get().builtInRegistryHolder()
+
+                        Blocks.WHITE_WOOL.builtInRegistryHolder(),
+                        Blocks.ORANGE_WOOL.builtInRegistryHolder(),
+                        Blocks.MAGENTA_WOOL.builtInRegistryHolder(),
+                        Blocks.LIGHT_BLUE_WOOL.builtInRegistryHolder(),
+                        Blocks.YELLOW_WOOL.builtInRegistryHolder(),
+                        Blocks.LIME_WOOL.builtInRegistryHolder(),
+                        Blocks.PINK_WOOL.builtInRegistryHolder(),
+                        Blocks.GRAY_WOOL.builtInRegistryHolder(),
+                        Blocks.LIGHT_GRAY_WOOL.builtInRegistryHolder(),
+                        Blocks.CYAN_WOOL.builtInRegistryHolder(),
+                        Blocks.PURPLE_WOOL.builtInRegistryHolder(),
+                        Blocks.BLUE_WOOL.builtInRegistryHolder(),
+                        Blocks.BROWN_WOOL.builtInRegistryHolder(),
+                        Blocks.GREEN_WOOL.builtInRegistryHolder(),
+                        Blocks.RED_WOOL.builtInRegistryHolder(),
+                        Blocks.BLACK_WOOL.builtInRegistryHolder()
                 ),
-                UniformFloat.of(2.0F, 8.0F), // Larger caves
-                UniformFloat.of(1.5F, 6.0F), // Taller caves
+                UniformFloat.of(1.0F, 3.0F), // Small caves
+                UniformFloat.of(1.0F, 2.0F), // Low caves
                 UniformFloat.of(-1.0F, -0.4F)
         );
     }
 
     private static CaveCarverConfiguration createBubbleChamberConfig() {
         return new CaveCarverConfiguration(
-                0.3F, // Higher probability (30%)
-                UniformHeight.of(VerticalAnchor.absolute(30), VerticalAnchor.absolute(120)),
+                0.05F, // Very rare
+                UniformHeight.of(VerticalAnchor.absolute(30), VerticalAnchor.absolute(100)),
                 UniformFloat.of(0.3F, 0.7F),
                 VerticalAnchor.aboveBottom(8),
                 CarverDebugSettings.of(false, Blocks.MAGENTA_GLAZED_TERRACOTTA.defaultBlockState()),
-                // FIX: Proper replaceable blocks
                 HolderSet.direct(
                         Blocks.STONE.builtInRegistryHolder(),
                         Blocks.DEEPSLATE.builtInRegistryHolder(),
-                        ModBlocks.BROWN_PILLOW.get().builtInRegistryHolder(),
-                        ModBlocks.PILLOW_GRASS_BLOCK.get().builtInRegistryHolder(),
-                        ModBlocks.YELLOW_PILLOW_GRASS_BLOCK.get().builtInRegistryHolder()
+                        ModBlocks.BROWN_PILLOW.get().builtInRegistryHolder()
                 ),
-                UniformFloat.of(8.0F, 20.0F), // HUGE spherical chambers
-                UniformFloat.of(8.0F, 20.0F), // Perfectly spherical
+                UniformFloat.of(3.0F, 5.0F), // Small spherical chambers
+                UniformFloat.of(3.0F, 5.0F), // Perfect spheres
                 UniformFloat.of(-1.0F, -0.4F)
         );
     }
@@ -304,7 +337,6 @@ public class ModFeatures {
 
     public static void bootstrapConfiguredCarvers(BootstrapContext<ConfiguredWorldCarver<?>> context) {
         context.register(PILLOW_CAVE_KEY, new ConfiguredWorldCarver<>(ModCarvers.PILLOW_CAVE.get(), createPillowCaveConfig()));
-        context.register(PILLOW_CANYON_KEY, new ConfiguredWorldCarver<>(ModCarvers.PILLOW_CANYON.get(), createPillowCanyonConfig()));
         context.register(BUBBLE_CHAMBER_KEY, new ConfiguredWorldCarver<>(ModCarvers.BUBBLE_CHAMBER.get(), createBubbleChamberConfig()));
     }
 }

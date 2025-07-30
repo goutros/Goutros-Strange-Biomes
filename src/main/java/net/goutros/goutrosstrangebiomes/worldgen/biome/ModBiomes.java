@@ -64,6 +64,7 @@ public class ModBiomes {
         context.register(PILLOW_PLATEAU, createPillowPlateau(placedFeatures, carvers));
     }
 
+
     private static Biome createPillowPlateau(HolderGetter<PlacedFeature> placedFeatures,
                                              HolderGetter<ConfiguredWorldCarver<?>> carvers) {
 
@@ -74,24 +75,17 @@ public class ModBiomes {
         BiomeGenerationSettings.Builder generationBuilder =
                 new BiomeGenerationSettings.Builder(placedFeatures, carvers);
 
-        // Add custom carvers
+        // ONLY small cave carvers - terrain is handled by density functions!
         generationBuilder.addCarver(GenerationStep.Carving.AIR,
                 carvers.getOrThrow(ModFeatures.PILLOW_CAVE_KEY));
         generationBuilder.addCarver(GenerationStep.Carving.AIR,
-                carvers.getOrThrow(ModFeatures.PILLOW_CANYON_KEY));
-        generationBuilder.addCarver(GenerationStep.Carving.AIR,
                 carvers.getOrThrow(ModFeatures.BUBBLE_CHAMBER_KEY));
 
-        // Add basic underground features
-        BiomeDefaultFeatures.addDefaultCarversAndLakes(generationBuilder);
-        BiomeDefaultFeatures.addDefaultCrystalFormations(generationBuilder);
+        // Standard underground features
         BiomeDefaultFeatures.addDefaultMonsterRoom(generationBuilder);
         BiomeDefaultFeatures.addDefaultUndergroundVariety(generationBuilder);
         BiomeDefaultFeatures.addDefaultSprings(generationBuilder);
         BiomeDefaultFeatures.addSurfaceFreezing(generationBuilder);
-
-        // Custom terrain features (these will be added via biome modifiers)
-        // Don't add them here to avoid duplication
 
         return new Biome.BiomeBuilder()
                 .hasPrecipitation(true)
