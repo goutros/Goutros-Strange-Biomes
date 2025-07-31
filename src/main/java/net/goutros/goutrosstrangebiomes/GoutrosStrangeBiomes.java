@@ -1,6 +1,7 @@
 package net.goutros.goutrosstrangebiomes;
 
 import net.goutros.goutrosstrangebiomes.block.ModBlocks;
+import net.goutros.goutrosstrangebiomes.client.PastelUnderwaterFogHandler;
 import net.goutros.goutrosstrangebiomes.client.PastelWaterFogHandler;
 import net.goutros.goutrosstrangebiomes.tab.ModCreativeTabs;
 import net.goutros.goutrosstrangebiomes.worldgen.biome.ModBiomes;
@@ -9,7 +10,10 @@ import net.goutros.goutrosstrangebiomes.worldgen.surface.ModSurfaceRules;
 import net.goutros.goutrosstrangebiomes.entity.ModEntities;
 import net.goutros.goutrosstrangebiomes.item.ModItems;
 import net.goutros.goutrosstrangebiomes.worldgen.carver.ModCarvers;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.client.renderer.BiomeColors;
+import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.common.NeoForge;
 import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
@@ -55,15 +59,24 @@ public class GoutrosStrangeBiomes {
                     MOD_ID,
                     ModSurfaceRules.pillowPlateauSurface()
             );
-
-            LOGGER.info("Mesa-style layered terrain ready! No more arithmetic patterns!");
         });
     }
 
+    // In GoutrosStrangeBiomes.java clientSetup method
     private void clientSetup(final FMLClientSetupEvent event) {
         event.enqueueWork(() -> {
-            NeoForge.EVENT_BUS.register(PastelWaterFogHandler.class);
-            LOGGER.info("Client setup complete - custom pastel fog handler registered!");
+            NeoForge.EVENT_BUS.register(PastelUnderwaterFogHandler.class);
+
+            // FORCE register water colors manually
+            BlockColors blockColors = Minecraft.getInstance().getBlockColors();
+            blockColors.register((state, world, pos, tintIndex) -> {
+                if (pos != null) {
+                    return 0x00FF00; // Bright green test
+                }
+                return 0x3F76E4;
+            }, Blocks.WATER);
+
+            GoutrosStrangeBiomes.LOGGER.info("MANUALLY registered water colors!");
         });
     }
 }
