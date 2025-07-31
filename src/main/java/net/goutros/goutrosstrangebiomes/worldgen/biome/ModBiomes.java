@@ -2,7 +2,6 @@ package net.goutros.goutrosstrangebiomes.worldgen.biome;
 
 import net.goutros.goutrosstrangebiomes.GoutrosStrangeBiomes;
 import net.goutros.goutrosstrangebiomes.entity.ModEntities;
-import net.goutros.goutrosstrangebiomes.worldgen.features.ModFeatures;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BiomeDefaultFeatures;
@@ -15,7 +14,6 @@ import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.*;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -43,8 +41,8 @@ public class ModBiomes {
                 .temperature(0.8f)
                 .downfall(0.6f)
                 .specialEffects(new BiomeSpecialEffects.Builder()
-                        .waterColor(0x8900331)
-                        .waterFogColor(0x15792383)
+                        .waterColor(0x90C8F0)
+                        .waterFogColor(0xB0D8FF)
                         .skyColor(0xffc0cb)
                         .grassColorOverride(0x98fb98)
                         .foliageColorOverride(0xdda0dd)
@@ -75,13 +73,7 @@ public class ModBiomes {
         BiomeGenerationSettings.Builder generationBuilder =
                 new BiomeGenerationSettings.Builder(placedFeatures, carvers);
 
-        // ONLY small cave carvers - terrain is handled by density functions!
-        generationBuilder.addCarver(GenerationStep.Carving.AIR,
-                carvers.getOrThrow(ModFeatures.PILLOW_CAVE_KEY));
-        generationBuilder.addCarver(GenerationStep.Carving.AIR,
-                carvers.getOrThrow(ModFeatures.BUBBLE_CHAMBER_KEY));
-
-        // Standard underground features
+        // Standard vanilla features for underground
         BiomeDefaultFeatures.addDefaultMonsterRoom(generationBuilder);
         BiomeDefaultFeatures.addDefaultUndergroundVariety(generationBuilder);
         BiomeDefaultFeatures.addDefaultSprings(generationBuilder);

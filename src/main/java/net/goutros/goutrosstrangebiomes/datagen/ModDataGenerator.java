@@ -5,7 +5,6 @@ import net.goutros.goutrosstrangebiomes.block.ModBlocks;
 import net.goutros.goutrosstrangebiomes.entity.ModEntities;
 import net.goutros.goutrosstrangebiomes.item.ModItems;
 import net.goutros.goutrosstrangebiomes.worldgen.biome.ModBiomes;
-import net.goutros.goutrosstrangebiomes.worldgen.features.ModFeatures;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -35,13 +34,8 @@ import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
 import net.neoforged.neoforge.common.data.BlockTagsProvider;
 import net.neoforged.neoforge.common.data.DatapackBuiltinEntriesProvider;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
-import net.neoforged.neoforge.common.data.JsonCodecProvider;
-import net.neoforged.neoforge.common.world.BiomeModifier;
-import net.neoforged.neoforge.common.world.BiomeModifiers;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
-import net.minecraft.core.HolderSet;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.levelgen.GenerationStep;
 
 import java.util.List;
 import java.util.Set;
@@ -60,10 +54,11 @@ public class ModDataGenerator {
         CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
         ExistingFileHelper fileHelper = event.getExistingFileHelper();
 
-        // Basic data providers
-        generator.addProvider(event.includeServer(), new ModRecipeProvider(packOutput, lookupProvider));
+        // Registry provider for biomes and features
         generator.addProvider(event.includeServer(), new ModBiomeProvider(packOutput, lookupProvider));
-        generator.addProvider(event.includeServer(), new ModBiomeModifierProvider(packOutput, lookupProvider));
+
+        // All other providers
+        generator.addProvider(event.includeServer(), new ModRecipeProvider(packOutput, lookupProvider));
         generator.addProvider(event.includeServer(), new LootTableProvider(packOutput, Set.of(),
                 List.of(
                         new LootTableProvider.SubProviderEntry(ModBlockLootProvider::new, LootContextParamSets.BLOCK),
@@ -425,62 +420,10 @@ class ModEntityLootTables extends EntityLootSubProvider {
 class ModBiomeProvider extends DatapackBuiltinEntriesProvider {
     private static final RegistrySetBuilder BUILDER =
             new RegistrySetBuilder()
-                    .add(Registries.BIOME, ModBiomes::bootstrapBiomes) // Biomes first
-                    .add(Registries.CONFIGURED_FEATURE, ModFeatures::bootstrapConfiguredFeatures)
-                    .add(Registries.PLACED_FEATURE, ModFeatures::bootstrapPlacedFeatures)
-                    .add(Registries.CONFIGURED_CARVER, ModFeatures::bootstrapConfiguredCarvers);
+                    // Finally biomes (they're referenced by biome modifiers)
+                    .add(Registries.BIOME, ModBiomes::bootstrapBiomes);
 
     public ModBiomeProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
         super(output, registries, BUILDER, Set.of(GoutrosStrangeBiomes.MOD_ID));
-    }
-}
-
-class ModBiomeModifierProvider extends JsonCodecProvider<BiomeModifier> {
-
-    public ModBiomeModifierProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider) {
-        super(output, PackOutput.Target.DATA_PACK, "neoforge/biome_modifier",
-                net.minecraft.server.packs.PackType.SERVER_DATA,
-                BiomeModifier.DIRECT_CODEC, lookupProvider, GoutrosStrangeBiomes.MOD_ID, null);
-    }
-
-    @Override
-    protected void gather() {
-        var biomeRegistry = this.lookupProvider.join().lookupOrThrow(Registries.BIOME);
-        var featureRegistry = this.lookupProvider.join().lookupOrThrow(Registries.PLACED_FEATURE);
-
-        // CRITICAL FIX: Ensure biome exists before creating modifiers
-        try {
-            var pillowBiome = biomeRegistry.getOrThrow(ModBiomes.PILLOW_PLATEAU);
-
-            // Add pillow terrain features (SURFACE_STRUCTURES for blocks like buttons)
-            add("add_pillow_terrain", new BiomeModifiers.AddFeaturesBiomeModifier(
-                    HolderSet.direct(pillowBiome),
-                    HolderSet.direct(featureRegistry.getOrThrow(ModFeatures.PILLOW_TERRAIN_PLACED_KEY)),
-                    GenerationStep.Decoration.UNDERGROUND_DECORATION // Changed from RAW_GENERATION
-            ));
-
-            // Add pillow surface features
-            add("add_pillow_surface", new BiomeModifiers.AddFeaturesBiomeModifier(
-                    HolderSet.direct(pillowBiome),
-                    HolderSet.direct(featureRegistry.getOrThrow(ModFeatures.PILLOW_SURFACE_PLACED_KEY)),
-                    GenerationStep.Decoration.VEGETAL_DECORATION
-            ));
-
-            // Add button placement
-            add("add_button_placement", new BiomeModifiers.AddFeaturesBiomeModifier(
-                    HolderSet.direct(pillowBiome),
-                    HolderSet.direct(featureRegistry.getOrThrow(ModFeatures.BUTTON_PATCHES_PLACED_KEY)),
-                    GenerationStep.Decoration.SURFACE_STRUCTURES // Better step for blocks
-            ));
-
-            GoutrosStrangeBiomes.LOGGER.info("Biome modifiers registered successfully");
-
-        } catch (Exception e) {
-            GoutrosStrangeBiomes.LOGGER.error("Failed to register biome modifiers: {}", e.getMessage());
-        }
-    }
-
-    private void add(String name, BiomeModifier modifier) {
-        this.unconditional(ResourceLocation.fromNamespaceAndPath(GoutrosStrangeBiomes.MOD_ID, name), modifier);
     }
 }

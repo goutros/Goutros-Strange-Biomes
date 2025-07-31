@@ -1,6 +1,7 @@
 package net.goutros.goutrosstrangebiomes;
 
 import net.goutros.goutrosstrangebiomes.block.ModBlocks;
+import net.goutros.goutrosstrangebiomes.client.PastelWaterFogHandler;
 import net.goutros.goutrosstrangebiomes.tab.ModCreativeTabs;
 import net.goutros.goutrosstrangebiomes.worldgen.biome.ModBiomes;
 import net.goutros.goutrosstrangebiomes.worldgen.biome.PillowPlateauRegion;
@@ -8,7 +9,8 @@ import net.goutros.goutrosstrangebiomes.worldgen.surface.ModSurfaceRules;
 import net.goutros.goutrosstrangebiomes.entity.ModEntities;
 import net.goutros.goutrosstrangebiomes.item.ModItems;
 import net.goutros.goutrosstrangebiomes.worldgen.carver.ModCarvers;
-import net.goutros.goutrosstrangebiomes.worldgen.features.ModFeatures;
+import net.minecraft.client.renderer.BiomeColors;
+import net.neoforged.neoforge.common.NeoForge;
 import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
 import net.minecraft.resources.ResourceLocation;
@@ -33,9 +35,6 @@ public class GoutrosStrangeBiomes {
         ModEntities.ENTITY_TYPES.register(modEventBus);
 
         ModBiomes.BIOMES.register(modEventBus);
-        ModFeatures.CONFIGURED_FEATURES.register(modEventBus);
-        ModFeatures.PLACED_FEATURES.register(modEventBus);
-        ModFeatures.CONFIGURED_CARVERS.register(modEventBus);
         ModCarvers.CARVERS.register(modEventBus);
 
         ModCreativeTabs.CREATIVE_TABS.register(modEventBus);
@@ -63,7 +62,8 @@ public class GoutrosStrangeBiomes {
 
     private void clientSetup(final FMLClientSetupEvent event) {
         event.enqueueWork(() -> {
-            LOGGER.info("Client setup complete - ready for beautiful terrain!");
+            NeoForge.EVENT_BUS.register(PastelWaterFogHandler.class);
+            LOGGER.info("Client setup complete - custom pastel fog handler registered!");
         });
     }
 }
